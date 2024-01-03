@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
-
-'''Task 1: FIFO caching
-'''
-
-
-from collections import OrderedDict
+"""
+FIFO caching module
+"""
 from base_caching import BaseCaching
+from typing import Any, Optional
 
 
 class FIFOCache(BaseCaching):
-    '''A class `FIFOCache` that inherits from
-       `BaseCaching` and is a caching system.
-    '''
+    """ FIFO cache class
+    """
 
-    def __init__(self):
-        super().__init__()
-        self.cache_data = OrderedDict()
-
-    def put(self, key, item):
-        '''assign to the dictionary `self.cache_data` the
-           `item` value for the key `key`
-        '''
-
-        if key is None or item is None:
+    def put(self, key: Any, item: Any) -> None:
+        """ Adds data to cache based on FIFO policy
+            - Args:
+                - key: new entry's key
+                - item: entry's value
+        """
+        if not key or not item:
             return
+        new_cache_data = {key: item}
+        if len(self.cache_data) == self.MAX_ITEMS:
+            cache_keys = list(self.cache_data.keys())
+            key_to_remove = cache_keys[0]
+            self.cache_data.pop(key_to_remove)
+            print(f'DISCARD: {key_to_remove}')
+        self.cache_data.update(new_cache_data)
 
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-            first_key, _ = self.cache_data.popitem(last=False)
-            print(f"DISCARD: {first_key}")
-
-        self.cache_data[key] = item
-
-    def get(self, key):
-        '''return the value in `self.cache_data` linked to `key`
-        '''
-        return self.cache_data.get(key, None)
+    def get(self, key: Any) -> Optional[Any]:
+        """ Gets cache data associated with given key
+            - Args:
+                - key to look for
+            - Return:
+                - value associated with the key
+        """
+        return self.cache_data.get(key)
